@@ -205,7 +205,7 @@ const History = () => {
 
               <p className="text-xl text-white/90 leading-relaxed">
                 As we continue our journey, we remain committed to excellence, innovation, and the development of
-                world-class athletes. Our history inspires us, but our future drives us forward. Together, we're
+                world-class athletes. Our history inspires us, but our future drives us forward. Together, we&apos;re
                 building the next chapter of Bangladesh athletics.
               </p>
 

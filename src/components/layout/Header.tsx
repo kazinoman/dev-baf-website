@@ -35,6 +35,8 @@ interface MegamenuContent {
   [key: string]: MegamenuContentItem;
 }
 
+type NavigationLevel = "main" | "sections" | "links";
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
@@ -43,9 +45,10 @@ export default function Header() {
   const [language, setLanguage] = useState<string>("bn");
 
   // Navigation state for mobile
-  const [navigationLevel, setNavigationLevel] = useState("main"); // "main", "sections", "links"
-  const [selectedMenu, setSelectedMenu] = useState(null);
-  const [selectedSection, setSelectedSection] = useState<any>(null);
+  // Navigation state for mobile
+  const [navigationLevel, setNavigationLevel] = useState<NavigationLevel>("main");
+  const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
+  const [selectedSection, setSelectedSection] = useState<MegamenuSection | null>(null);
 
   const menus: MenuItem[] = [
     { name: "The Federation", href: "/gallery", hasMegamenu: true },
@@ -203,7 +206,7 @@ export default function Header() {
     }, 300);
   };
 
-  const handleMainMenuClick = (menu: any) => {
+  const handleMainMenuClick = (menu: MenuItem) => {
     if (menu.hasMegamenu) {
       setSelectedMenu(menu.name);
       setNavigationLevel("sections");
@@ -213,7 +216,7 @@ export default function Header() {
     }
   };
 
-  const handleSectionClick = (section: any) => {
+  const handleSectionClick = (section: MegamenuSection) => {
     setSelectedSection(section);
     setNavigationLevel("links");
   };
@@ -480,7 +483,7 @@ export default function Header() {
                         </button>
                       )}
 
-                      {selectedSection?.links?.map((link: any, idx: number) => (
+                      {selectedSection?.links?.map((link: MegamenuLink, idx: number) => (
                         <a
                           key={idx}
                           href={link.href}

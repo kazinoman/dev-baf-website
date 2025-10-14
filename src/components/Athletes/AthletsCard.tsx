@@ -8,12 +8,12 @@ const teamColors: Record<string, string> = {
   Tigers: "bg-orange-100 text-orange-800",
 };
 
-interface Athlete {
+export interface IAthlete {
   id: number;
   full_name: string;
   photo_url?: string;
   team?: string;
-  gender: "male" | "female";
+  gender: string;
   athlete_category: string;
   bio?: string;
   preferred_events?: string[];
@@ -22,7 +22,7 @@ interface Athlete {
 }
 
 interface Props {
-  athlete: Athlete;
+  athlete: IAthlete;
 }
 
 const AthleteCard: React.FC<Props> = ({ athlete }) => {

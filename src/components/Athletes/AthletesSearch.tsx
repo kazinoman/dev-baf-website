@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Users, Search, Filter, Trophy, MapPin, Calendar, Award, X } from "lucide-react";
 import Button from "../ui/Button";
-import AthleteCard from "./AthletsCard";
+import AthleteCard, { IAthlete } from "./AthletsCard";
 import CustomSelect from "../ui/Select";
 
 const TEAMS = [
@@ -188,7 +188,7 @@ const AthletesSearch = () => {
       {/* Results Grid */}
       {filteredAthletes.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredAthletes.map((athlete: any, id: number) => (
+          {filteredAthletes.map((athlete: IAthlete, id: number) => (
             <AthleteCard key={athlete.id} athlete={athlete} />
           ))}
         </div>

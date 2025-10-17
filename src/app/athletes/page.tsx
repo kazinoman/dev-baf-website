@@ -4,9 +4,9 @@ import React from "react";
 
 const AthletesPage = () => {
   return (
-    <div>
+    <div className="bg-white  pt-40">
       {/* Hero Section */}
-      <div className="text-center mb-12 mt-40">
+      <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00704A]/10 to-[#C1272D]/10 rounded-full mb-6">
           <Users className="w-4 h-4 text-[#00704A]" />
           <span className="text-sm font-semibold text-[#00704A]">National Athletes</span>

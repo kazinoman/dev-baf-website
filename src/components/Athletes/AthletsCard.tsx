@@ -1,6 +1,7 @@
 import React from "react";
 import { Trophy, Award, Calendar } from "lucide-react";
 import { Badge } from "../ui/Badge";
+import { useRouter } from "next/navigation";
 
 const teamColors: Record<string, string> = {
   Falcons: "bg-blue-100 text-blue-800",
@@ -26,8 +27,12 @@ interface Props {
 }
 
 const AthleteCard: React.FC<Props> = ({ athlete }) => {
+  const router = useRouter();
   return (
-    <div className="rounded-xl border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group cursor-pointer">
+    <div
+      className="rounded-xl border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group cursor-pointer"
+      onClick={() => router.push(`/athletes/${athlete.id}`)}
+    >
       {/* Photo Section */}
       <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
         {athlete.photo_url ? (

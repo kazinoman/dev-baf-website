@@ -286,8 +286,8 @@ export default function BoardMembers() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mb-12 p-2 overflow-auto">
-          <TabsList className="flex flex-row items-center gap-4 bg-white border border-gray-200 p-1 rounded-xl">
+        <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mb-12 p-2 md:w-fit">
+          <TabsList className="flex flex-row items-center gap-4 bg-white border border-gray-200 p-1 rounded-xl overflow-auto">
             {Object.entries(categoryInfo).map(([key, info]) => {
               const Icon = info.icon;
               return (

@@ -143,8 +143,8 @@ export default function Header() {
           title: "About BAF",
           links: [
             { name: "Our History", href: "/history" },
-            { name: "Mission & Vision", href: "/mission" },
-            { name: "Organizational Structure", href: "/structure" },
+            { name: "Mission & Vision", href: "/mission-and-vision" },
+            { name: "Organizational Structure", href: "/organizational-structure" },
           ],
         },
         {

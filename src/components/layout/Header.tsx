@@ -123,9 +123,9 @@ export default function Header() {
         {
           title: "Media & Publications",
           links: [
-            { name: "Photo & Video Gallery", href: "/news/gallery" },
-            { name: "Press Releases & News Articles", href: "/news/interviews" },
-            { name: "Media Accreditation", href: "/news/features" },
+            { name: "Photo & Video Gallery", href: "/photo-gallery" },
+            { name: "Press Releases & News Articles", href: "/press-releases" },
+            { name: "Media Accreditation", href: "/media-inquire" },
           ],
         },
         {

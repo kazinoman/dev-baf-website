@@ -5,8 +5,8 @@ import Link from "next/link";
 import React from "react";
 
 type ButtonColor = {
-  type: "button" | "submit" | "reset";
   children: React.ReactNode;
+  type?: "button" | "submit" | "reset";
   variant?: "white" | "black" | "orange";
   size?: "small" | "medium";
   href?: string;

@@ -64,16 +64,16 @@ export default function Header() {
           title: "Athlete Portal",
           links: [
             { name: "Online Registration", href: "/athletes/all" },
-            { name: "Athlete Login", href: "/athletes/track-field" },
-            { name: "Athlete Dashboard", href: "/athletes/swimming" },
+            // { name: "Athlete Login", href: "/athletes/track-field" },
+            // { name: "Athlete Dashboard", href: "/athletes/swimming" },
           ],
         },
         {
           title: "Categories",
           links: [
-            { name: "All", href: "/athletes" },
-            { name: "Senior Division", href: "/athletes/elite" },
-            { name: "Junior Division", href: "/athletes/youth" },
+            { name: "All Athletes", href: "/athletes" },
+            // { name: "Senior Division", href: "/athletes/elite" },
+            // { name: "Junior Division", href: "/athletes/youth" },
           ],
         },
         {
@@ -91,11 +91,10 @@ export default function Header() {
         {
           title: "Competitions & Championships",
           links: [
+            { name: "All Events", href: "/events/all" },
             { name: "Upcoming Events", href: "/events/all" },
-            { name: "Event Categories (Track, Field, etc.)", href: "/events/championships" },
-            { name: "Event Registration", href: "/events/tournaments" },
-            { name: "Past Event Results", href: "/events/results" },
-            { name: "Live Updates / Live Stream", href: "/events/live" },
+            { name: "Past Results", href: "/events/results" },
+            { name: "Live Updates", href: "/events/live" },
           ],
         },
         {
@@ -103,8 +102,8 @@ export default function Header() {
           links: [
             { name: "National Training Programs", href: "/events/register" },
             { name: "Certified Coaches", href: "/events/rules" },
-            { name: "Training Camps & Workshops", href: "/events/schedule" },
-            { name: "Talent Scouting & Junior Programs", href: "/events/volunteer" },
+            { name: "Talent Development", href: "/events/volunteer" },
+            { name: "Workshops & Seminars", href: "/events/schedule" },
           ],
         },
       ],
@@ -124,15 +123,14 @@ export default function Header() {
           title: "Media & Publications",
           links: [
             { name: "Photo & Video Gallery", href: "/photo-gallery" },
-            { name: "Press Releases & News Articles", href: "/press-releases" },
+            { name: "Press Releases", href: "/press-releases" },
             { name: "Media Accreditation", href: "/media-inquire" },
           ],
         },
         {
           title: "Support & FAQs",
           links: [
-            { name: "Help Center", href: "/news/press-kit" },
-            { name: "Common Questions", href: "/news/media-contacts" },
+            { name: "Frequently Asked Questions", href: "/news/press-kit" }
           ],
         },
       ],

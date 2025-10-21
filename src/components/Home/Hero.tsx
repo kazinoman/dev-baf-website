@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import Image from "next/image";
 
+
 import bg1 from "@/assets/images/home/banner/banner-bg3.jpg";
 import bg2 from "@/assets/images/home/banner/banner-bg1.jpg";
 import img from "@/assets/images/home/banner/banner1.jpg";

@@ -13,9 +13,20 @@ type ButtonColor = {
   buttonEvent?: () => void;
   className?: string;
   onClick?: () => void; // ✅ renamed from buttonEvent
+  disabled?: boolean;
 };
 
-const Button = ({ type = "button", children, variant, buttonEvent, className, size, href, onClick }: ButtonColor) => {
+const Button = ({
+  type = "button",
+  children,
+  variant,
+  buttonEvent,
+  className,
+  size,
+  href,
+  onClick,
+  disabled,
+}: ButtonColor) => {
   const variants: Record<"white" | "black" | "orange", string> = {
     white: "text-neutral-900 bg-neutral-900",
     black: "text-white hover:border hover:border-white",
@@ -55,6 +66,7 @@ const Button = ({ type = "button", children, variant, buttonEvent, className, si
         onClick={onClick}
         type={type}
         className={` group relative inline-flex items-center justify-center px-6 py-4 text-sm font-semibold uppercase tracking-widest overflow-hidden transition-colors ease-in-out duration-500 ${className} ${variants[variant]}`}
+        disabled={disabled}
       >
         <span className="relative z-10 flex items-center gap-2 group-hover:text-white">
           {children}
@@ -79,7 +91,7 @@ const Button = ({ type = "button", children, variant, buttonEvent, className, si
     } else {
       // Normal button
       return (
-        <button onClick={buttonEvent} type={type} className={`${sizes[size]} ${className}`}>
+        <button disabled={disabled} onClick={buttonEvent} type={type} className={`${sizes[size]} ${className}`}>
           {children}
         </button>
       );

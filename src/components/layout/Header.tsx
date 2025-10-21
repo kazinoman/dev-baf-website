@@ -100,7 +100,7 @@ export default function Header() {
         {
           title: "Training & Coaching",
           links: [
-            { name: "National Training Programs", href: "/events/register" },
+            { name: "National Training Programs", href: "/national-training-program" },
             { name: "Certified Coaches", href: "/events/rules" },
             { name: "Talent Development", href: "/events/volunteer" },
             { name: "Workshops & Seminars", href: "/events/schedule" },
@@ -129,9 +129,7 @@ export default function Header() {
         },
         {
           title: "Support & FAQs",
-          links: [
-            { name: "Frequently Asked Questions", href: "/news/press-kit" }
-          ],
+          links: [{ name: "Frequently Asked Questions", href: "/news/press-kit" }],
         },
       ],
     },

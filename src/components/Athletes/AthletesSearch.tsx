@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Users, Search, Filter, Trophy, MapPin, Calendar, Award, X } from "lucide-react";
 import Button from "../ui/Button";
 import AthleteCard, { IAthlete } from "./AthletsCard";
-import CustomSelect from "../ui/Select";
+import CustomSelect from "../ui/CustomSelect";
 
 const TEAMS = [
   "All Teams",

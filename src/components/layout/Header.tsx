@@ -102,8 +102,8 @@ export default function Header() {
           links: [
             { name: "National Training Programs", href: "/national-training-program" },
             { name: "Certified Coaches", href: "/certified-coach" },
-            { name: "Talent Development", href: "/events/volunteer" },
-            { name: "Workshops & Seminars", href: "/events/schedule" },
+            { name: "Talent Development", href: "/talent-development" },
+            { name: "Workshops & Seminars", href: "/workshop" },
           ],
         },
       ],

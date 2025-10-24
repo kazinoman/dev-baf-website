@@ -16,7 +16,7 @@ const variantClasses: Record<Variant, string> = {
   default: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
   secondary: "text-[#111111] font-semibold duration-500 cursor-pointer",
   destructive: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-  outline: "border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-400",
+  outline: "border border-gray-300 text-gray-700  focus:ring-gray-400",
 };
 
 export function Badge({ variant = "default", className = "", children, ...props }: BadgeProps) {

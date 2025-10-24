@@ -28,14 +28,16 @@ const Button = ({
   disabled,
 }: ButtonColor) => {
   const variants: Record<"white" | "black" | "orange", string> = {
-    white: "text-neutral-900 bg-neutral-900",
-    black: "text-white hover:border hover:border-white",
-    orange: "text-white bg-neutral-900",
+    white: "text-neutral-900 bg-black text-black hover:text-white disabled:text-gray-400 disabled:cursor-not-allowe",
+    black:
+      "text-white hover:border hover:border-white text-white hover:text-black disabled:text-gray-400 disabled:cursor-not-allowed",
+    orange: "text-white bg-neutral-900 disabled:text-gray-400 disabled:cursor-not-allowe",
   };
 
   const overlayVariants: Record<"white" | "black" | "orange", string> = {
-    white: "absolute inset-0 bg-white transition-transform duration-500 group-hover:scale-x-0 origin-center",
-    black: "absolute inset-0 bg-neutral-900 transition-transform duration-500 group-hover:scale-x-0 origin-center",
+    white: "absolute inset-0 bg-white transition-transform duration-500 group-hover:scale-x-0 origin-center text-black",
+    black:
+      "absolute inset-0 bg-neutral-900 transition-transform duration-500 group-hover:scale-x-0 origin-center text-white",
     orange: "absolute inset-0 bg-red-600 transition-transform duration-500 group-hover:scale-x-0 origin-center",
   };
 
@@ -53,9 +55,9 @@ const Button = ({
           href={`/${href}`}
           className={` group relative inline-flex items-center justify-center px-6 py-4 text-sm font-semibold uppercase tracking-widest overflow-hidden transition-colors ease-in-out duration-500 ${className} ${variants[variant]}`}
         >
-          <span className="relative z-10 flex items-center gap-2 group-hover:text-white">
+          <span className="relative z-10 flex items-center gap-2 ">
             {children}
-            <ArrowRight className="w-4 h-4 transition-colors duration-500 group-hover:text-white " />
+            <ArrowRight className="w-4 h-4 transition-colors duration-500  " />
           </span>
 
           <span className={overlayVariants[variant]} />
@@ -68,9 +70,9 @@ const Button = ({
         className={` group relative inline-flex items-center justify-center px-6 py-4 text-sm font-semibold uppercase tracking-widest overflow-hidden transition-colors ease-in-out duration-500 ${className} ${variants[variant]}`}
         disabled={disabled}
       >
-        <span className="relative z-10 flex items-center gap-2 group-hover:text-white">
+        <span className="relative z-10 flex items-center gap-2 ">
           {children}
-          <ArrowRight className="w-4 h-4 transition-colors duration-500 group-hover:text-white " />
+          <ArrowRight className="w-4 h-4 transition-colors duration-500" />
         </span>
 
         <span className={overlayVariants[variant]} />

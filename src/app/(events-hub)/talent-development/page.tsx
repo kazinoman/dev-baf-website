@@ -304,90 +304,94 @@ export default function TalentDevelopmentPage() {
                 </div>
 
                 {/* Program Info */}
-                <CardContent className="p-6 space-y-4">
-                  <p className="text-gray-600 line-clamp-3 leading-relaxed">{program.description}</p>
+                <CardContent className="py-3 space-y-4 flex flex-col justify-between h-full">
+                  <div className="space-y-6">
+                    <p className="text-gray-600 line-clamp-3 leading-relaxed">{program.description}</p>
 
-                  {/* Key Info */}
-                  <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-100">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-[#00704A]" />
-                      <div>
-                        <div className="text-xs text-gray-500">Starts</div>
-                        <div className="font-semibold">{format(new Date(program.start_date), "MMM d")}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-[#C1272D]" />
-                      <div>
-                        <div className="text-xs text-gray-500">Duration</div>
-                        <div className="font-semibold">{program.duration}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm col-span-2">
-                      <MapPin className="w-4 h-4 text-[#D4AF37]" />
-                      <div>
-                        <div className="text-xs text-gray-500">Location</div>
-                        <div className="font-semibold">{program.location}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Highlights */}
-                  {program.program_features?.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-[#2D3436] mb-2 flex items-center gap-2">
-                        <Star className="w-4 h-4 text-[#D4AF37]" />
-                        Program Highlights
-                      </h4>
-                      <div className="space-y-1">
-                        {program.program_features.slice(0, 3).map((feature, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-[#00704A]" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Apply */}
-                  <div className="flex items-center justify-between pt-4">
-                    <div>
-                      {spotsLeft > 0 ? (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Users className="w-4 h-4 text-[#00704A]" />
-                          <span className="font-semibold text-[#00704A]">{spotsLeft} spots left</span>
+                    {/* Key Info */}
+                    <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-100">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-[#00704A]" />
+                        <div>
+                          <div className="text-xs text-gray-500">Starts</div>
+                          <div className="font-semibold">{format(new Date(program.start_date), "MMM d")}</div>
                         </div>
-                      ) : (
-                        <Badge variant="outline" className="border-red-500 text-red-600">
-                          Full
-                        </Badge>
-                      )}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4 text-[#C1272D]" />
+                        <div>
+                          <div className="text-xs text-gray-500">Duration</div>
+                          <div className="font-semibold">{program.duration}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm col-span-2">
+                        <MapPin className="w-4 h-4 text-[#D4AF37]" />
+                        <div>
+                          <div className="text-xs text-gray-500">Location</div>
+                          <div className="font-semibold">{program.location}</div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-[#D4AF37]" />
-                      <span className="text-lg font-bold text-[#00704A]">
-                        {program.fee === 0 ? "Free" : `${program.fee} BDT`}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => router.push(`/apply?id=${program.id}`)}
-                    disabled={spotsLeft <= 0}
-                    className="w-full h-12 bg-gradient-to-r from-[#00704A] to-[#005239] hover:from-[#005239] hover:to-[#00704A] text-white text-base font-semibold"
-                  >
-                    {spotsLeft > 0 ? (
-                      <>
-                        Apply Now <ArrowRight className="w-5 h-5 ml-2" />
-                      </>
-                    ) : (
-                      "Program Full"
+                    {/* Highlights */}
+                    {program.program_features?.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-[#2D3436] mb-2 flex items-center gap-2">
+                          <Star className="w-4 h-4 text-[#D4AF37]" />
+                          Program Highlights
+                        </h4>
+                        <div className="space-y-1">
+                          {program.program_features.slice(0, 3).map((feature, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                              <CheckCircle className="w-4 h-4 text-[#00704A]" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </Button>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {/* Apply */}
+                    <div className="flex items-center justify-between pt-4">
+                      <div>
+                        {spotsLeft > 0 ? (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Users className="w-4 h-4 text-[#00704A]" />
+                            <span className="font-semibold text-[#00704A]">{spotsLeft} spots left</span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="border-red-500 text-red-600">
+                            Full
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4 text-[#D4AF37]" />
+                        <span className="text-lg font-bold text-[#00704A]">
+                          {program.fee === 0 ? "Free" : `${program.fee} BDT`}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="black"
+                      onClick={() => router.push(`/apply?id=${program.id}`)}
+                      disabled={spotsLeft <= 0}
+                      className="w-full h-12 bg-gradient-to-r from-[#00704A] to-[#005239] hover:from-[#005239] hover:to-[#00704A] text-white text-base font-semibold"
+                    >
+                      {spotsLeft > 0 ? (
+                        <>
+                          Apply Now <ArrowRight className="w-5 h-5 ml-2" />
+                        </>
+                      ) : (
+                        "Program Full"
+                      )}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );

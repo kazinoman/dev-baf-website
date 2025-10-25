@@ -28,16 +28,14 @@ const Button = ({
   disabled,
 }: ButtonColor) => {
   const variants: Record<"white" | "black" | "orange", string> = {
-    white: "text-neutral-900 bg-black text-black hover:text-white disabled:text-gray-400 disabled:cursor-not-allowe",
-    black:
-      "text-white hover:border hover:border-white text-white hover:text-black disabled:text-gray-400 disabled:cursor-not-allowed",
+    white: "text-neutral-900 bg-black text-black hover:text-[#000] disabled:text-gray-400 disabled:cursor-not-allowe",
+    black: "hover:border  hover:text-black disabled:text-gray-400 disabled:cursor-not-allowed border ",
     orange: "text-white bg-neutral-900 disabled:text-gray-400 disabled:cursor-not-allowe",
   };
 
   const overlayVariants: Record<"white" | "black" | "orange", string> = {
     white: "absolute inset-0 bg-white transition-transform duration-500 group-hover:scale-x-0 origin-center text-black",
-    black:
-      "absolute inset-0 bg-neutral-900 transition-transform duration-500 group-hover:scale-x-0 origin-center text-white",
+    black: "absolute inset-0  transition-transform duration-500 group-hover:scale-x-0 origin-center",
     orange: "absolute inset-0 bg-red-600 transition-transform duration-500 group-hover:scale-x-0 origin-center",
   };
 

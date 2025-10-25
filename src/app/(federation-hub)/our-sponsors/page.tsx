@@ -21,6 +21,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import Button from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { useRouter } from "next/navigation";
 
 const tierColors: Record<string, string> = {
   platinum: "from-gray-300 to-gray-400",
@@ -81,6 +82,8 @@ const dummySponsors = [
 export default function SponsorsPage() {
   const [filter, setFilter] = useState("all");
 
+  const router = useRouter();
+
   const filteredSponsors =
     filter === "all" ? dummySponsors : dummySponsors.filter((s) => s.sponsorship_tier === filter);
 
@@ -113,7 +116,7 @@ export default function SponsorsPage() {
               promoting excellence in Bangladesh.
             </p>
 
-            <Link href="/become-a-sponsor">
+            <Link href="/our-sponsors/apply-for-sponsorship">
               <Button
                 type="button"
                 variant="black"

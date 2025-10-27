@@ -79,9 +79,9 @@ export default function Header() {
         {
           title: "Rankings & Records",
           links: [
-            { name: "National Rankings", href: "/resources/training" },
-            { name: "Records (National & International)", href: "/resources/nutrition" },
-            { name: "Hall of Fame", href: "/resources/stories" },
+            { name: "National Rankings", href: "/ranking" },
+            { name: "Records (National & International)", href: "/record" },
+            { name: "Hall of Fame", href: "/hall-of-fame" },
           ],
         },
       ],
@@ -129,7 +129,7 @@ export default function Header() {
         },
         {
           title: "Support & FAQs",
-          links: [{ name: "Frequently Asked Questions", href: "/news/press-kit" }],
+          links: [{ name: "Frequently Asked Questions", href: "/resource-faq" }],
         },
       ],
     },
@@ -146,9 +146,9 @@ export default function Header() {
         {
           title: "Partnerships & Sponsors",
           links: [
-            { name: "Our Partners & Sponsors", href: "/gallery/sponsors" },
-            { name: "Become a Sponsor", href: "/gallery/become-sponsor" },
-            { name: "Partnership Programs", href: "/gallery/partners" },
+            { name: "Our Partners & Sponsors", href: "/our-sponsors" },
+            { name: "Become a Sponsor", href: "/our-sponsors/apply-for-sponsorship" },
+            { name: "Partnership Programs", href: "/partnership-program" },
           ],
         },
         {

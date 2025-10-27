@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -43,12 +43,12 @@ const ATHLETIC_DISCIPLINES = [
 
 export default function TalentProgramApplication() {
   const router = useRouter();
-  const params = useSearchParams();
-  const programId = params.get("id") || "mock-program-1";
+  // const params = useSearchParams();
+  // const programId = params.get("id") || "mock-program-1";
 
   // Mock program data
   const program = {
-    id: programId,
+    id: 1212,
     program_name: "Youth Athletics Talent Program",
     scholarship_available: true,
     scholarship_criteria: "Scholarships are available for talented students from low-income families.",
@@ -548,89 +548,95 @@ export default function TalentProgramApplication() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-10 px-4 pt-40">
-      <div className="max-w-4xl mx-auto">
-        <Button variant="black" onClick={() => router.back()} className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-10 px-4 pt-40">
+        <div className="max-w-4xl mx-auto">
+          <Button variant="black" onClick={() => router.back()} className="mb-6">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
 
-        <Card className="border-none shadow-xl mb-8">
-          <div className="h-32 bg-gradient-to-r from-[#00704A] to-[#005239] flex items-center px-8">
-            <div>
-              <Badge variant="outline" className="bg-white/20 text-white mb-2">
-                Application Form
-              </Badge>
-              <h1 className="text-3xl font-bold text-white">{program.program_name}</h1>
-            </div>
-          </div>
-        </Card>
-
-        {/* Progress bar */}
-        <div className="flex justify-between mb-10 relative">
-          <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2">
-            <div
-              //   className="h-1 bg-green-700 transition-all duration-500"
-              style={{
-                width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
-              }}
-            />
-          </div>
-          {steps.map((s) => {
-            const Icon = s.icon;
-            return (
-              <div key={s.number} className="flex flex-col items-center z-10">
-                <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-full ${
-                    currentStep >= s.number
-                      ? "bg-gradient-to-r from-[#00704A] to-[#005239] text-white"
-                      : "bg-white border border-gray-300 text-gray-400"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span
-                  className={`text-[11px] xs:text-xs sm:text-sm mt-2 ${
-                    currentStep >= s.number ? "text-[#00704A]" : "text-gray-400"
-                  }`}
-                >
-                  {s.title}
-                </span>
+          <Card className="border-none shadow-xl mb-8">
+            <div className="h-32 bg-gradient-to-r from-[#00704A] to-[#005239] flex items-center px-8">
+              <div>
+                <Badge variant="outline" className="bg-white/20 text-white mb-2">
+                  Application Form
+                </Badge>
+                <h1 className="text-3xl font-bold text-white">{program.program_name}</h1>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Step content */}
-        <Card className="shadow-lg border-none">
-          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white px-8 py-4">
-            <CardTitle className="text-2xl font-bold">{steps[currentStep - 1].title}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-8">
-            {renderStepContent()}
-
-            <div className="flex justify-between mt-8 pt-6 border-t">
-              <Button variant="black" disabled={currentStep === 1} onClick={() => setCurrentStep((p) => p - 1)}>
-                Previous
-              </Button>
-              {currentStep < steps.length ? (
-                <Button
-                  variant="white"
-                  type="button"
-                  onClick={() => setCurrentStep((p) => p + 1)}
-                  className="bg-gradient-to-r from-[#00704A] to-[#005239] hover:from-[#005239] hover:to-[#00704A] "
-                >
-                  Next
-                </Button>
-              ) : (
-                <Button variant="black" onClick={handleSubmit} className="bg-red-700 hover:bg-red-800 hover:text-white">
-                  <Send className="mr-2 w-4 h-4" /> Submit
-                </Button>
-              )}
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+
+          {/* Progress bar */}
+          <div className="flex justify-between mb-10 relative">
+            <div className="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2">
+              <div
+                //   className="h-1 bg-green-700 transition-all duration-500"
+                style={{
+                  width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
+                }}
+              />
+            </div>
+            {steps.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div key={s.number} className="flex flex-col items-center z-10">
+                  <div
+                    className={`w-12 h-12 flex items-center justify-center rounded-full ${
+                      currentStep >= s.number
+                        ? "bg-gradient-to-r from-[#00704A] to-[#005239] text-white"
+                        : "bg-white border border-gray-300 text-gray-400"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span
+                    className={`text-[11px] xs:text-xs sm:text-sm mt-2 ${
+                      currentStep >= s.number ? "text-[#00704A]" : "text-gray-400"
+                    }`}
+                  >
+                    {s.title}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Step content */}
+          <Card className="shadow-lg border-none">
+            <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white px-8 py-4">
+              <CardTitle className="text-2xl font-bold">{steps[currentStep - 1].title}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              {renderStepContent()}
+
+              <div className="flex justify-between mt-8 pt-6 border-t">
+                <Button variant="black" disabled={currentStep === 1} onClick={() => setCurrentStep((p) => p - 1)}>
+                  Previous
+                </Button>
+                {currentStep < steps.length ? (
+                  <Button
+                    variant="white"
+                    type="button"
+                    onClick={() => setCurrentStep((p) => p + 1)}
+                    className="bg-gradient-to-r from-[#00704A] to-[#005239] hover:from-[#005239] hover:to-[#00704A] "
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    variant="black"
+                    onClick={handleSubmit}
+                    className="bg-red-700 hover:bg-red-800 hover:text-white"
+                  >
+                    <Send className="mr-2 w-4 h-4" /> Submit
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </Suspense>
   );
 }

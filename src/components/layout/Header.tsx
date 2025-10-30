@@ -113,10 +113,12 @@ export default function Header() {
         {
           title: "Anti-Doping & Fair Play",
           links: [
-            { name: "Anti-Doping Rules", href: "/news/all" },
-            { name: "Approved & Banned Substances", href: "/news/press-releases" },
-            { name: "WADA Guidelines", href: "/news/athlete-updates" },
-            { name: "Report Violations", href: "/news/results" },
+            { name: "Anti-Doping", href: "/anti-doping" },
+            { name: "Anti-Doping Rules", href: "/anti-doping/rules-and-regulation" },
+            { name: "Approved Substances", href: "/anti-doping/approved-supplements" },
+            { name: "Banned Substances", href: "/anti-doping/banned-supplements" },
+            { name: "WADA Guidelines", href: "/anti-doping/wada-guidelines" },
+            { name: "Report Violations", href: "/anti-doping/violation-report" },
           ],
         },
         {

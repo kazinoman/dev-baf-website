@@ -70,7 +70,7 @@ const Button = ({
       >
         <span className="relative z-10 flex items-center gap-2 ">
           {children}
-          <ArrowRight className="w-4 h-4 transition-colors duration-500" />
+          {/* <ArrowRight className="w-4 h-4 transition-colors duration-500" /> */}
         </span>
 
         <span className={overlayVariants[variant]} />

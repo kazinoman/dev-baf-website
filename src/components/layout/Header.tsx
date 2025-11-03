@@ -91,9 +91,9 @@ export default function Header() {
         {
           title: "Competitions & Championships",
           links: [
-            { name: "All Events", href: "/events/all" },
+            { name: "All Events", href: "/all-events" },
             { name: "Upcoming Events", href: "/events/all" },
-            { name: "Past Results", href: "/events/results" },
+            { name: "Past Results", href: "/post-event-result" },
             { name: "Live Updates", href: "/events/live" },
           ],
         },

@@ -828,12 +828,16 @@ export default function EventsPage() {
                         </Button>
                       )}
                       {event.status === "completed" && (
-                        <Button onClick={() => router.push(`/events/${event.id}`)} variant="black" className="flex-1">
+                        <Button
+                          onClick={() => router.push(`/all-event/${event.id}`)}
+                          variant="black"
+                          className="flex-1"
+                        >
                           View Results
                         </Button>
                       )}
                       <Button
-                        onClick={() => router.push(`/events/${event.id}`)}
+                        onClick={() => router.push(`/all-event/${event.id}`)}
                         variant="black"
                         className={`${event.status !== "completed" && "flex-1 w-full"}`}
                       >

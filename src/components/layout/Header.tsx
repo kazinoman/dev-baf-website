@@ -57,13 +57,14 @@ export default function Header() {
     { name: "Resources & Media", href: "/news", hasMegamenu: true },
   ];
 
+
   const megamenuContent: MegamenuContent = {
     ["Athletes Hub"]: {
       sections: [
         {
           title: "Athlete Portal",
           links: [
-            { name: "Online Registration", href: "/athletes/all" },
+            { name: "Online Registration", href: "/registration" },
             // { name: "Athlete Login", href: "/athletes/track-field" },
             // { name: "Athlete Dashboard", href: "/athletes/swimming" },
           ],

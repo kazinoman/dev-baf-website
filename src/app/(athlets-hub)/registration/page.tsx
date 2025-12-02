@@ -6,12 +6,14 @@ import {
   SubmitHandler,
   UseFormSetValue,
   Control,
+  useFieldArray,
 } from "react-hook-form";
 import { motion } from "framer-motion";
 import TwoStepDistrictSelect from "@/components/ui/TwoStepSearchableSelect";
 import ImageUploadField from "@/components/ui/ImageUploadField";
-import { ListMinus } from "lucide-react";
+import { FileChartLine, ListMinus } from "lucide-react";
 import DocumentForm from "@/components/ui/documentForm";
+import { number } from "zod";
 
 const districts = [
   { id: "Bogura", name: "Bogura" },
@@ -41,6 +43,7 @@ export interface AthleteFormDto {
   nidFile: FileList;
   photo: FileList;
   permanentDistrict: string;
+  AthleteDocPhysicalPathUrl: FileList | null;
 }
 
 export interface AthleteGeneralDto {
@@ -80,7 +83,7 @@ export interface AthleteAddressDto {
 type FormData = {
   phone: string;
   dob: string;
-  gender: "male" | "female" | "";
+  gender: "male" | "female";
   nid: string;
   address: string;
   city: string;
@@ -103,34 +106,91 @@ const DISTRICTS = [
 interface TDocuments {
   AthleteDocName: string;
   AthleteDocRelatedId: string;
-  AthleteDocPhysicalPathUrl: string;
+  AthleteDocPhysicalPathUrl: File | null;
   DocCategoryId: 1;
 }
 
+const tabledata = [
+  { id: 1, name: "Milon Ahmed", age: 24, country: "Bangladesh" },
+  { id: 2, name: "John Doe", age: 28, country: "USA" },
+  { id: 3, name: "Jane Smith", age: 22, country: "UK" },
+];
+
+const columns = [
+  { key: "id", label: "ID" },
+  { key: "name", label: "Doc Name" },
+  { key: "age", label: "Doc Related" },
+  { key: "country", label: "Doc Category" },
+  { key: "actions", label: "Actions" },
+];
+
 export default function MultiStepForm() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [step, setStep] = useState<number>(1);
-  const [presentAddressArea, setPresentAddressArea] = useState("");
+  const [presentAddressArea, setPresentAddressArea] = useState<string>("");
   const [permanentAddressArea, setpermanentAddressArea] = useState("");
   const [presendPostalCode, setPresendPostalCode] = useState("");
   const [permanentPostalCode, setpermanentPostalCode] = useState("");
   const [error, setError] = useState("");
-  const [presentDistrict, setpresentDistrict] = useState("");
-  const [permanentDistrict, setpermanentDistrict] = useState("");
-  const [presentSubDistrict, setpresentSubDistrict] = useState("");
-  const [permanentSubDistrict, setPermanentSubDistrict] = useState("");
+  const [presentDistrict, setpresentDistrict] = useState<number>(0);
+  const [permanentDistrict, setpermanentDistrict] = useState<number>(0);
+  const [presentSubDistrict, setpresentSubDistrict] = useState<number>(0);
+  const [permanentSubDistrict, setPermanentSubDistrict] = useState<number>(0);
 
   const {
     register,
     handleSubmit,
     trigger,
-    formState: { errors },
+    formState: { errors, touchedFields },
     setValue,
     control,
     watch,
+    reset,
   } = useForm<AthleteFormDto>({
-    mode: "onTouched",
+    // mode: "onTouched",
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
+    shouldUnregister: true,
     defaultValues: {},
   });
+
+  const [documentsArray, setDocumentsArray] = useState<TDocuments[]>([]);
+
+  const handleAddDocument = () => {
+    // Get values from your form
+    const docName = watch("AthleteDocuments.0.AthleteDocName");
+    const docRelatedId = watch("AthleteDocuments.0.AthleteDocRelatedId");
+    const docCategory = watch("AthleteDocuments.0.DocCategoryId");
+    // const docFile = watch("AthleteDocuments.0.AthleteDocPhysicalPathUrl");
+    const docFile = watch("AthleteDocPhysicalPathUrl");
+    const file = docFile?.[0];
+
+    console.log({ docFile, file });
+
+    if (!docFile || docFile.length === 0) return;
+
+    const newDoc = {
+      AthleteDocName: docName,
+      AthleteDocRelatedId: docRelatedId,
+      DocCategoryId: Number(docCategory),
+      AthleteDocPhysicalPathUrl: file,
+    };
+
+    // console.log({newDoc})
+
+    setDocumentsArray([...documentsArray, newDoc as unknown as TDocuments]);
+
+    // Clear input fields for next document
+    setValue("AthleteDocuments.0.AthleteDocName", "");
+    setValue("AthleteDocuments.0.AthleteDocRelatedId", "");
+    setValue("AthleteDocuments.0.DocCategoryId", 1);
+    setValue("AthleteDocPhysicalPathUrl", null);
+
+    // Reset the actual file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const nextStep = async () => {
     let valid = false;
@@ -158,24 +218,95 @@ export default function MultiStepForm() {
       valid = await trigger(["permanentDistrict"]);
     }
 
+    if (step === 3) {
+      const isValid = await trigger([
+        "AthleteDocuments.0.AthleteDocName",
+        "AthleteDocuments.0.AthleteDocRelatedId",
+        "AthleteDocuments.0.DocCategoryId",
+      ]);
+
+      if (!isValid) return;
+    }
+
     if (valid) setStep((prev) => prev + 1);
   };
 
   const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit: SubmitHandler<AthleteFormDto> = (data) => {
-    if (!presendPostalCode) {
-      setError("Postal code required");
-      return;
-    }
-
     const finalData = {
       ...data,
       // nidFile,
       // photo: photoFile,
     };
 
-    console.log("Final Submitted Data:", finalData);
+    const newDoc = {
+      AthleteDocName: data?.AthleteDocuments?.[0]?.AthleteDocName,
+      AthleteDocRelatedId: data?.AthleteDocuments?.[0]?.AthleteDocRelatedId,
+      DocCategoryId: Number(data?.AthleteDocuments?.[0]?.DocCategoryId),
+      AthleteDocPhysicalPathUrl: data.AthleteDocPhysicalPathUrl?.[0],
+    };
+
+    const updatedDocs = [...documentsArray, newDoc as TDocuments];
+
+    const athleteForm = {
+      athleteGenData: {
+        athleteFullName: data.AthleteGenData?.AthleteFullName,
+        athleteFatherName: data.AthleteGenData?.AthleteFatherName,
+        athleteMotherName: data.AthleteGenData?.AthleteMotherName,
+        athleteEmail: data.AthleteGenData?.AthleteEmail,
+        athleteContactNo: data?.AthleteGenData?.AthleteContactNo,
+        athleteDob: data.AthleteGenData?.AthleteDob,
+        athleteGender: data?.AthleteGenData?.AthleteGender,
+        athleteAlternateContactNo:
+          data.AthleteGenData?.AthleteAlternateContactNo,
+        instituteId: data.AthleteGenData?.InstituteId,
+      },
+      athleteCoreDataInBengali: {
+        athleteFullNameInBengali:
+          data.AthleteCoreDataInBengali?.AthleteFullNameInBengali,
+        athleteFatherNameInBengali:
+          data.AthleteCoreDataInBengali?.AthleteFatherNameInBengali,
+        athleteMotherNameInBengali:
+          data.AthleteCoreDataInBengali?.AthleteFullNameInBengali,
+      },
+      athleteAddresses: [
+        {
+          athleteAddressDistrictId: presentDistrict,
+          athleteAddressSubDistrictId: presentSubDistrict,
+          athleteAddressPostalCode: Number(presendPostalCode),
+          athleteAddressArea: presentAddressArea,
+          athleteAddressType: 1,
+        },
+        {
+          athleteAddressDistrictId: permanentDistrict,
+          athleteAddressSubDistrictId: permanentSubDistrict,
+          athleteAddressPostalCode: Number(permanentPostalCode),
+          athleteAddressArea: permanentAddressArea,
+          athleteAddressType: 1,
+        },
+      ],
+      athleteDocuments: updatedDocs,
+    };
+
+    console.log("Final Submitted:", athleteForm);
+    // console.log("Final Submitted Data:", finalData);
+
+    // console.log({
+    //   presentDistrict,
+    //   presentSubDistrict,
+    //   presendPostalCode,
+    //   presentAddressArea,
+    //   permanentDistrict,
+    //   permanentSubDistrict,
+    //   permanentPostalCode,
+    //   permanentAddressArea,
+    // });
+
+    setDocumentsArray(updatedDocs);
+
+    //  Form reset
+    reset();
   };
 
   const handleChangePresendPostalCode = (
@@ -217,30 +348,14 @@ export default function MultiStepForm() {
       setpermanentPostalCode(presendPostalCode);
       setpermanentAddressArea(presentAddressArea);
     } else {
-      setpermanentDistrict("");
-      setPermanentSubDistrict("");
+      setpermanentDistrict(0);
+      setPermanentSubDistrict(0);
       setpermanentPostalCode("");
       setpermanentAddressArea("");
     }
   };
 
-  console.log({
-    presentDistrict,
-    presentSubDistrict,
-    presendPostalCode,
-    presentAddressArea,
-    permanentDistrict,
-    permanentSubDistrict,
-    permanentPostalCode,
-    permanentAddressArea
-  })
-
-  const onDocumentSubmit = (data: TDocuments) => {
-    console.log("DDDDDDDD", {
-      data,
-      AthleteDocPhysicalPathUrl: data.AthleteDocPhysicalPathUrl,
-    });
-  };
+  //  console.log({documentsArray})
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 pt-40 bg-white">
@@ -512,7 +627,7 @@ export default function MultiStepForm() {
                     {...register("AthleteGenData.AthleteAlternateContactNo", {
                       required: "Alternate Contact No is required",
                     })}
-                    placeholder="Enter NID number"
+                    placeholder="Enter Alternate Contact No"
                     className="w-full mt-1 px-4 py-2 border rounded-lg"
                   />
                   {errors?.AthleteGenData?.AthleteAlternateContactNo && (
@@ -534,12 +649,12 @@ export default function MultiStepForm() {
             >
               <h2 className="text-xl font-semibold">Address Information</h2>
 
-              <h4 className="text-md font-semibold">Present Address</h4>
+              <h4 className="text-md font-semibold">Present Address </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Select District *
+                    Select District  <span className="text-red-600"> *</span>
                   </label>
                   <TwoStepDistrictSelect
                     name="presentDistrict"
@@ -553,7 +668,8 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Upazila *
+                    Upazila 
+                    <span className="text-red-600"> *</span>
                   </label>
 
                   <TwoStepDistrictSelect
@@ -568,31 +684,33 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium">
-                    Postal Code *
+                    Postal Code 
+                    <span className="text-red-600"> *</span>
                   </label>
                   <input
-                    type="text"
-                    value={presendPostalCode}
+                    type="number"
+                    value={presendPostalCode || ""}
                     placeholder="Enter Postal Code"
                     onChange={handleChangePresendPostalCode}
                     className="w-full mt-1 px-4 py-2 border rounded-lg"
                   />
                   {error && <p className="text-red-500 text-sm">{error}</p>}
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium">
-                    Address Area *
-                  </label>
-                  <input
-                    type="text"
-                    value={presentAddressArea}
-                    placeholder="Enter Address Area"
-                    onChange={handleChangepresendAddressArea}
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  />
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                </div>
+              <div className="w-full">
+                <label className="block text-sm font-medium">
+                  Address Area 
+                  <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  type="text"
+                  value={presentAddressArea}
+                  placeholder="Enter Address Area"
+                  onChange={handleChangepresendAddressArea}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
               </div>
 
               <div className="flex gap-4">
@@ -612,10 +730,11 @@ export default function MultiStepForm() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Select District *
+                    Select District 
+                    <span className="text-red-600"> *</span>
                   </label>
                   <TwoStepDistrictSelect
                     name="permanentDistrict"
@@ -635,7 +754,8 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Upazila *
+                    Upazila 
+                    <span className="text-red-600"> *</span>
                   </label>
 
                   <TwoStepDistrictSelect
@@ -650,36 +770,39 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium">
-                    Postal Code *
+                    Postal Code 
+                    <span className="text-red-600"> *</span>
                   </label>
                   <input
-                    type="text"
-                    value={permanentPostalCode}
+                    type="number"
+                    value={permanentPostalCode || ""}
                     placeholder="Enter Postal Code"
                     onChange={handleChangePermanentPostalCode}
                     className="w-full mt-1 px-4 py-2 border rounded-lg"
                   />
                   {error && <p className="text-red-500 text-sm">{error}</p>}
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium">
-                    Address Area *
-                  </label>
-                  <input
-                    type="text"
-                    value={permanentAddressArea}
-                    placeholder="Enter Address Area"
-                    onChange={handleChangepermanentAddressArea}
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  />
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                </div>
+              <div className="w-full">
+                <label className="block text-sm font-medium">
+                  Address Area 
+                  <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  type="text"
+                  value={permanentAddressArea}
+                  placeholder="Enter Address Area"
+                  onChange={handleChangepermanentAddressArea}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
               </div>
             </motion.div>
           )}
 
           {/* STEP 3 - DOCUMENT */}
+
           {step === 3 && (
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -688,14 +811,17 @@ export default function MultiStepForm() {
             >
               <h2 className="text-xl font-semibold">Upload Documents</h2>
 
-              {/* Image it  */}
-             <ImageUploadField name="AthleteDocPhysicalPathUrl" control={control} label="Doc File" />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" > 
+              <ImageUploadField
+                name="AthleteDocPhysicalPathUrl"
+                inputRef={fileInputRef}
+                control={control}
+                label="Doc File"
+              />
 
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium">
-                    Doc Name 
+                    Doc Name
                     <span className="text-red-600"> *</span>
                   </label>
                   <input
@@ -705,13 +831,20 @@ export default function MultiStepForm() {
                     placeholder="Enter Athlete Document Name"
                     className="w-full mt-1 px-4 py-2 border rounded-lg "
                   />
-                  {errors.AthleteDocuments?.[0]?.AthleteDocName && (
+                  {/* {errors.AthleteDocuments?.[0]?.AthleteDocName?.message && (
                     <p className="text-red-500 text-sm">
                       {errors?.AthleteDocuments?.[0]?.AthleteDocName.message}
                     </p>
-                  )}
+                  )} */}
+
+                  {errors.AthleteDocuments?.[0]?.AthleteDocName &&
+                    touchedFields.AthleteDocuments?.[0]?.AthleteDocName && (
+                      <p className="text-red-500 text-sm">
+                        {errors.AthleteDocuments[0].AthleteDocName?.message}
+                      </p>
+                    )}
                 </div>
-            
+
                 <div>
                   <label className="block text-sm font-medium">
                     Doc Related Id
@@ -724,16 +857,21 @@ export default function MultiStepForm() {
                     placeholder=" Doc Related Id"
                     className="w-full mt-1 px-4 py-2 border rounded-lg "
                   />
-                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId && (
-                    <p className="text-red-500 text-sm">
-                      {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId.message}
-                    </p>
-                  )}
+                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId &&
+                    touchedFields.AthleteDocuments?.[0]
+                      ?.AthleteDocRelatedId && (
+                      <p className="text-red-500 text-sm">
+                        {
+                          errors.AthleteDocuments?.[0]?.AthleteDocRelatedId
+                            .message
+                        }
+                      </p>
+                    )}
                 </div>
-            
+
                 <div>
                   <label className="block text-sm font-medium">
-                     Doc Category
+                    Doc Category
                     <span className="text-red-600"> *</span>
                   </label>
                   <select
@@ -747,15 +885,62 @@ export default function MultiStepForm() {
                     <option value="2">B</option>
                     <option value="3">C</option>
                   </select>
-                  {errors.AthleteDocuments?.[0]?.DocCategoryId && (
-                    <p className="text-red-500 text-sm">
-                      {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
-                    </p>
-                  )}
+                  {errors.AthleteDocuments?.[0]?.DocCategoryId &&
+                    touchedFields.AthleteDocuments?.[0]?.DocCategoryId && (
+                      <p className="text-red-500 text-sm">
+                        {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
+                      </p>
+                    )}
                 </div>
-                </div> 
+              </div>
 
-              
+              <button
+                type="button"
+                onClick={handleAddDocument}
+                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg"
+              >
+                Add New Document
+              </button>
+
+              {/* This is Grid table  */}
+
+              <div className="overflow-x-auto w-full">
+                <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      {columns.map((column) => (
+                        <th
+                          key={column.key}
+                          className="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                        >
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {documentsArray?.map((tr, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                          {idx + 1}
+                        </td>
+                        <td className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                          {tr.AthleteDocName}
+                        </td>
+                        <td className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                          {tr.AthleteDocRelatedId}
+                        </td>
+                        <td className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                          {tr.DocCategoryId}
+                        </td>
+                        <td className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                          <FileChartLine />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </motion.div>
           )}
 

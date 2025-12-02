@@ -11,8 +11,8 @@ export type Props = {
   placeholder?: string;
   className?: string;
 
-  firstValue: string;
-  setFirstValue: React.Dispatch<React.SetStateAction<string>>;
+  firstValue: number;
+  setFirstValue: React.Dispatch<React.SetStateAction<number>>;
   setValue: UseFormSetValue<any>;
   DISTRICTS: District[]
 };
@@ -62,17 +62,19 @@ export default function TwoStepDistrictSelect({
   }, []);
 
   function handleFirstSelect(d: District) {
-    setFirstValue(d.name);              // ✅ update local state
-    setValue(name, d.name);             // ✅ set RHF value
-
+    setFirstValue(Number(d.id));              
+    setValue(name, Number( d.id));             
     setQuery("");
     setShowSecond(false);
     setOpenDropdown(false);
   }
 
   function handleSecondSelect(d: District) {
-    setFirstValue(d.name);              // ✅ update parent state
-    setValue(name, d.name);             // ✅ set RHF value
+    // setFirstValue(d.name);             
+    // setValue(name, d.name);             
+    setFirstValue(Number(d.id))
+    setValue(name, Number(d.id))
+
 
     setQuery("");
     setShowSecond(false);
@@ -135,6 +137,8 @@ export default function TwoStepDistrictSelect({
         {openDropdown && !showSecond && (
           <ul className="absolute mt-1 z-50 max-h-52 w-full overflow-auto border rounded bg-white shadow">
             {filtered.map((d, i) => (
+
+              
               <li
                 key={d.id}
                 className={`px-3 py-2 cursor-pointer ${

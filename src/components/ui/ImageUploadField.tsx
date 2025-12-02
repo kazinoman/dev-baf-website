@@ -10,6 +10,7 @@ export type ImageUploadFieldProps = {
   accept?: string;
   maxSizeInMB?: number; // file size validation
   className?: string;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 };
 
 export default function ImageUploadField({
@@ -19,9 +20,10 @@ export default function ImageUploadField({
   accept = "image/*",
   maxSizeInMB = 5,
   className = "",
+  inputRef
 }: ImageUploadFieldProps) {
   const [preview, setPreview] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  // const inputRef = useRef<HTMLInputElement | null>(null);
 
   // cleanup preview URL when component unmounts
   useEffect(() => {
@@ -114,34 +116,14 @@ export default function ImageUploadField({
 
               </div>
 
-               {/* <div className="flex flex-col justify-center items-center space-y-2 mt-5  ">
-                <div className="flex space-x-2 ">
-                  <button
-                    type="button"
-                    onClick={onChooseClick}
-                    className="px-3 py-2 rounded-md border hover:bg-gray-100"
-                  >
-                    Choose
-                  </button>
-
-                </div>
-
-                <div className="text-xs text-gray-500">
-                  Accept: {accept} • Max: {maxSizeInMB} MB
-                </div>
-
-                {fieldState.error && (
-                  <p className="text-sm text-red-600">{fieldState.error.message}</p>
-                )}
-              </div> */}
-
             </div>
 
             {/* hidden file input */}
             <input
-              ref={(e) => {
-                inputRef.current = e;
-              }}
+              // ref={(e) => {
+              //   inputRef.current = e;
+              // }}
+              ref={inputRef}
               type="file"
               accept={accept}
               onChange={handleChange}

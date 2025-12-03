@@ -11,28 +11,14 @@ import {
 import { motion } from "framer-motion";
 import TwoStepDistrictSelect from "@/components/ui/TwoStepSearchableSelect";
 import ImageUploadField from "@/components/ui/ImageUploadField";
-import { FileChartLine, ListMinus } from "lucide-react";
+import { BookText, FileChartLine, Globe, ListMinus, MapPin, ShieldCheck, User } from "lucide-react";
 import DocumentForm from "@/components/ui/documentForm";
-import { number } from "zod";
-
-const districts = [
-  { id: "Bogura", name: "Bogura" },
-  { id: "Barguna", name: "Barguna" },
-  { id: "Feni", name: "Feni" },
-  { id: "Gopalganj", name: "Gopalganj" },
-  { id: "Bhola", name: "Bhola" },
-];
-
-const presentsubDistricts = [
-  { id: "Bhola Sadar", name: "Bhola Sadar" },
-  { id: "Daulatkhan", name: "Daulatkhan" },
-  { id: "Burhanuddin", name: "Burhanuddin" },
-];
 
 // ================= Type ===================
 
 export interface AthleteFormDto {
   AthleteGenData?: AthleteGeneralDto;
+  identifierVerification: IdentifierVerification,
   AthleteCoreDataInBengali?: AthleteCoreDataInBengaliDto;
   AthleteAddresses?: AthleteAddressDto[];
   AthleteDocuments?: AthleteDocumentDto[];
@@ -68,7 +54,7 @@ export interface AthleteDocumentDto {
   AthleteDocName?: string;
   AthleteDocRelatedId?: string;
   AthleteDocPhysicalPathUrl?: string;
-  DocCategoryId?: number;
+  DocCategoryId?: number | null;
 }
 
 export interface AthleteAddressDto {
@@ -77,6 +63,12 @@ export interface AthleteAddressDto {
   AthleteAddressPostalCode?: number;
   AthleteAddressArea?: string;
   AthleteAddressType?: number;
+}
+
+interface IdentifierVerification {
+  identifierType: number;
+  idNumber: number;
+  identifierDocumentImages: File[] | string[]
 }
 
 // ============== Type form ===========
@@ -125,6 +117,7 @@ const columns = [
 ];
 
 export default function MultiStepForm() {
+  const [step3Error, setStep3Error] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [step, setStep] = useState<number>(1);
   const [presentAddressArea, setPresentAddressArea] = useState<string>("");
@@ -141,7 +134,7 @@ export default function MultiStepForm() {
     register,
     handleSubmit,
     trigger,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isSubmitted },
     setValue,
     control,
     watch,
@@ -150,10 +143,13 @@ export default function MultiStepForm() {
     // mode: "onTouched",
     mode: "onSubmit",
     reValidateMode: "onSubmit",
-    shouldUnregister: true,
-    defaultValues: {},
+    // shouldUnregister: true,
+    defaultValues: {
+      AthleteDocuments: [
+        { AthleteDocName: "", AthleteDocRelatedId: "", DocCategoryId: null },
+      ],
+    },
   });
-
   const [documentsArray, setDocumentsArray] = useState<TDocuments[]>([]);
 
   const handleAddDocument = () => {
@@ -206,32 +202,47 @@ export default function MultiStepForm() {
         "AthleteGenData.AthleteGender",
         "AthleteGenData.AthleteAlternateContactNo",
         "AthleteGenData.InstituteId",
-        "AthleteCoreDataInBengali.AthleteFullNameInBengali",
-        "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
-        "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
-
-        // document
+        // "AthleteCoreDataInBengali.AthleteFullNameInBengali",
+        // "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
+        // "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
       ]);
     }
 
-    if (step === 2) {
-      valid = await trigger(["permanentDistrict"]);
+    if(step === 2) {
+      valid = await trigger([])
     }
 
     if (step === 3) {
+      valid = await trigger([
+         "AthleteCoreDataInBengali.AthleteFullNameInBengali",
+        "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
+        "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
+      ]);
+    }
+
+    if(step === 4) {
+      valid = true
+    }
+
+    if (step === 5) {
       const isValid = await trigger([
         "AthleteDocuments.0.AthleteDocName",
         "AthleteDocuments.0.AthleteDocRelatedId",
         "AthleteDocuments.0.DocCategoryId",
       ]);
 
+      setStep3Error(!isValid);
       if (!isValid) return;
     }
 
     if (valid) setStep((prev) => prev + 1);
   };
 
+
+
   const prevStep = () => setStep((prev) => prev - 1);
+
+
 
   const onSubmit: SubmitHandler<AthleteFormDto> = (data) => {
     const finalData = {
@@ -239,6 +250,8 @@ export default function MultiStepForm() {
       // nidFile,
       // photo: photoFile,
     };
+
+    // console.log("Data:", data);
 
     const newDoc = {
       AthleteDocName: data?.AthleteDocuments?.[0]?.AthleteDocName,
@@ -268,7 +281,7 @@ export default function MultiStepForm() {
         athleteFatherNameInBengali:
           data.AthleteCoreDataInBengali?.AthleteFatherNameInBengali,
         athleteMotherNameInBengali:
-          data.AthleteCoreDataInBengali?.AthleteFullNameInBengali,
+          data.AthleteCoreDataInBengali?.AthleteMotherNameInBengali,
       },
       athleteAddresses: [
         {
@@ -287,6 +300,10 @@ export default function MultiStepForm() {
         },
       ],
       athleteDocuments: updatedDocs,
+      identifierVerification: {
+        identifierType: Number(data?.identifierVerification.identifierType),
+        idNumber: data?.identifierVerification?.idNumber
+      }
     };
 
     console.log("Final Submitted:", athleteForm);
@@ -306,7 +323,7 @@ export default function MultiStepForm() {
     setDocumentsArray(updatedDocs);
 
     //  Form reset
-    reset();
+    // reset();
   };
 
   const handleChangePresendPostalCode = (
@@ -358,25 +375,34 @@ export default function MultiStepForm() {
   //  console.log({documentsArray})
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 pt-40 bg-white">
-      <div className="w-full bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen p-6 pt-40 bg-white grid grid-cols-12 ">
+ 
+      <div className="col-span-4 flex justify-center items-center">
+        <h1>Content</h1>
+      </div>
+
+      <div className="w-full bg-white rounded-2xl shadow-lg p-8 col-span-8">
         {/* Steps Header */}
         <div className="flex justify-between mb-10">
           {[
-            { id: 1, label: "Information" },
-            { id: 2, label: "Address" },
-            { id: 3, label: "Documents" },
+            { id: 1, label: "Information", icon: <User /> },
+            { id: 2, label: "Identifier", icon: <ShieldCheck /> },
+             
+            { id: 3, label: "বাংলায় তথ্য", icon: <Globe />},
+            { id: 4, label: "Address", icon: <MapPin /> },
+            { id: 5, label: "Documents", icon: <BookText /> },
           ].map((item) => (
             <div key={item.id} className="flex flex-col items-center w-full">
               <div
+                onClick={() => setStep(item.id)}
                 className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold border-2 ${
                   step === item.id
                     ? "bg-green-600 text-white border-green-600"
                     : "border-gray-300 text-gray-500"
                 }`}
               >
-                {/* {item.id} */}
-                <ListMinus />
+                {item.icon}
+                
               </div>
               <span
                 className={`mt-2 text-sm ${
@@ -419,7 +445,9 @@ export default function MultiStepForm() {
                   )}
                 </div>
 
-                <div>
+                {/* Bangla Athlete Name  */}
+
+                {/* <div>
                   <label className="block text-sm font-medium">
                     ক্রীড়াবিদ পূর্ণ নাম (বাংলায়)
                     <span className="text-red-600"> *</span>
@@ -442,7 +470,7 @@ export default function MultiStepForm() {
                       }
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Father Name  */}
                 <div>
@@ -465,7 +493,7 @@ export default function MultiStepForm() {
                 </div>
 
                 {/* Father Name Bangali  */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium">
                     পিতার নাম নাম (বাংলায়)
                     <span className="text-red-600"> *</span>
@@ -488,7 +516,7 @@ export default function MultiStepForm() {
                       }
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Mother Name  English */}
                 <div>
@@ -511,7 +539,7 @@ export default function MultiStepForm() {
                 </div>
 
                 {/* Mother Name Bangali  */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium">
                     মাতার নাম (বাংলায়)
                     <span className="text-red-600"> *</span>
@@ -534,7 +562,7 @@ export default function MultiStepForm() {
                       }
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Email   */}
                 <div>
@@ -608,8 +636,8 @@ export default function MultiStepForm() {
                     className="w-full mt-1 px-4 py-2 border rounded-lg"
                   >
                     <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
                   </select>
                   {errors.AthleteGenData?.AthleteGender && (
                     <p className="text-red-500 text-sm">
@@ -640,8 +668,157 @@ export default function MultiStepForm() {
             </motion.div>
           )}
 
-          {/* STEP 2 - ADDRESS */}
           {step === 2 && (
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-6"
+            >
+            <h2 className="text-xl font-semibold">Identifier Verification</h2>
+
+
+             <div>
+                  <label className="block text-sm font-medium">
+                    Identifier Type
+                    <span className="text-red-600"> *</span>
+                  </label>
+                  <select
+                    {...register("identifierVerification.identifierType", {
+                      required: "Identifier Type is required",
+                    })}
+                    className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  >
+                    <option value="">Select Identifier Type</option>
+                    <option value="1">A</option>
+                    <option value="2">B</option>
+                    <option value="3">C</option>
+                    <option value="4">D</option>
+                  </select>
+                  {errors.identifierVerification?.identifierType && (
+                    <p className="text-red-500 text-sm">
+                      {errors.identifierVerification?.identifierType.message}
+                    </p>
+                  )}
+                </div>
+
+
+                <div>
+                  <label className="block text-sm font-medium">
+                    ID Number <span className="text-red-600"> *</span>
+                  </label>
+                  <input
+                    type="number"
+                    {...register("identifierVerification.idNumber", {
+                      required: "ID Number is required",
+                    })}
+                    placeholder="Enter Alternate Contact No"
+                    className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  />
+                  {errors?.identifierVerification?.idNumber && (
+                    <p className="text-red-500 text-sm">
+                      {errors.identifierVerification?.idNumber.message}
+                    </p>
+                  )}
+                </div>
+
+                 
+
+            </motion.div>
+          )}
+
+          {/* STEP 2 - ADDRESS */}
+            {
+              step === 3 && (
+                <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-6"
+            >
+             <h1>ব্যক্তিগত তথ্য বাংলায়</h1>
+
+
+                {/* Athletes Name Bangla */}
+                 <div>
+                  <label className="block text-sm font-medium">
+                    ক্রীড়াবিদ পূর্ণ নাম (বাংলায়)
+                    <span className="text-red-600"> *</span>
+                  </label>
+                  <input
+                    {...register(
+                      "AthleteCoreDataInBengali.AthleteFullNameInBengali",
+                      { required: "বাংলায় পূর্ণ নাম আবশ্যক" }
+                    )}
+                    placeholder="পূর্ণ নাম লিখুন (বাংলায়)"
+                    className="w-full mt-1 px-4 py-2 border rounded-lg "
+                  />
+
+                  {errors.AthleteCoreDataInBengali
+                    ?.AthleteFullNameInBengali && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        errors.AthleteCoreDataInBengali
+                          ?.AthleteFullNameInBengali?.message
+                      }
+                    </p>
+                  )}
+                </div>
+
+                {/* Father Name Bangla  */}
+                <div>
+                  <label className="block text-sm font-medium">
+                    পিতার নাম নাম (বাংলায়)
+                    <span className="text-red-600"> *</span>
+                  </label>
+                  <input
+                    {...register(
+                      "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
+                      { required: "পিতার নাম আবশ্যক" }
+                    )}
+                    placeholder="পিতার নাম লিখুন (বাংলায়)"
+                    className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  />
+
+                  {errors.AthleteCoreDataInBengali
+                    ?.AthleteFatherNameInBengali && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        errors.AthleteCoreDataInBengali
+                          ?.AthleteFatherNameInBengali?.message
+                      }
+                    </p>
+                  )}
+                </div>
+
+                {/* Mother Name Bangla  */}
+                  <div>
+                  <label className="block text-sm font-medium">
+                    মাতার নাম (বাংলায়)
+                    <span className="text-red-600"> *</span>
+                  </label>
+                  <input
+                    {...register(
+                      "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
+                      { required: "মাতার নাম আবশ্যক" }
+                    )}
+                    placeholder="মাতার নাম লিখুন (বাংলায়)"
+                    className="w-full mt-1 px-4 py-2 border rounded-lg"
+                  />
+
+                  {errors.AthleteCoreDataInBengali
+                    ?.AthleteMotherNameInBengali && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        errors.AthleteCoreDataInBengali
+                          ?.AthleteMotherNameInBengali?.message
+                      }
+                    </p>
+                  )}
+                </div>
+
+            </motion.div>
+              )}
+
+          {step === 4 && (
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -654,7 +831,7 @@ export default function MultiStepForm() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Select District  <span className="text-red-600"> *</span>
+                    Select District <span className="text-red-600"> *</span>
                   </label>
                   <TwoStepDistrictSelect
                     name="presentDistrict"
@@ -668,7 +845,7 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Upazila 
+                    Upazila
                     <span className="text-red-600"> *</span>
                   </label>
 
@@ -684,7 +861,7 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium">
-                    Postal Code 
+                    Postal Code
                     <span className="text-red-600"> *</span>
                   </label>
                   <input
@@ -700,7 +877,7 @@ export default function MultiStepForm() {
 
               <div className="w-full">
                 <label className="block text-sm font-medium">
-                  Address Area 
+                  Address Area
                   <span className="text-red-600"> *</span>
                 </label>
                 <input
@@ -733,7 +910,7 @@ export default function MultiStepForm() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Select District 
+                    Select District
                     <span className="text-red-600"> *</span>
                   </label>
                   <TwoStepDistrictSelect
@@ -754,7 +931,7 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Upazila 
+                    Upazila
                     <span className="text-red-600"> *</span>
                   </label>
 
@@ -770,7 +947,7 @@ export default function MultiStepForm() {
 
                 <div>
                   <label className="block text-sm font-medium">
-                    Postal Code 
+                    Postal Code
                     <span className="text-red-600"> *</span>
                   </label>
                   <input
@@ -786,7 +963,7 @@ export default function MultiStepForm() {
 
               <div className="w-full">
                 <label className="block text-sm font-medium">
-                  Address Area 
+                  Address Area
                   <span className="text-red-600"> *</span>
                 </label>
                 <input
@@ -802,8 +979,7 @@ export default function MultiStepForm() {
           )}
 
           {/* STEP 3 - DOCUMENT */}
-
-          {step === 3 && (
+          {step === 5 && (
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -837,8 +1013,7 @@ export default function MultiStepForm() {
                     </p>
                   )} */}
 
-                  {errors.AthleteDocuments?.[0]?.AthleteDocName &&
-                    touchedFields.AthleteDocuments?.[0]?.AthleteDocName && (
+                  {errors.AthleteDocuments?.[0]?.AthleteDocName && touchedFields.AthleteDocuments?.[0]?.AthleteDocName && (
                       <p className="text-red-500 text-sm">
                         {errors.AthleteDocuments[0].AthleteDocName?.message}
                       </p>
@@ -857,16 +1032,14 @@ export default function MultiStepForm() {
                     placeholder=" Doc Related Id"
                     className="w-full mt-1 px-4 py-2 border rounded-lg "
                   />
-                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId &&
-                    touchedFields.AthleteDocuments?.[0]
-                      ?.AthleteDocRelatedId && (
-                      <p className="text-red-500 text-sm">
-                        {
-                          errors.AthleteDocuments?.[0]?.AthleteDocRelatedId
-                            .message
-                        }
-                      </p>
-                    )}
+                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId && touchedFields.AthleteDocuments?.[0]?.AthleteDocRelatedId && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        errors.AthleteDocuments?.[0]?.AthleteDocRelatedId
+                          .message
+                      }
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -885,12 +1058,11 @@ export default function MultiStepForm() {
                     <option value="2">B</option>
                     <option value="3">C</option>
                   </select>
-                  {errors.AthleteDocuments?.[0]?.DocCategoryId &&
-                    touchedFields.AthleteDocuments?.[0]?.DocCategoryId && (
-                      <p className="text-red-500 text-sm">
-                        {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
-                      </p>
-                    )}
+                  {errors.AthleteDocuments?.[0]?.DocCategoryId && touchedFields.AthleteDocuments?.[0]?.DocCategoryId && (
+                    <p className="text-red-500 text-sm">
+                      {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -956,7 +1128,7 @@ export default function MultiStepForm() {
               </button>
             )}
 
-            {step < 3 ? (
+            {step < 5 ? (
               <button
                 type="button"
                 onClick={nextStep}

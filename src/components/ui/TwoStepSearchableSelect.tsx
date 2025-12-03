@@ -118,11 +118,15 @@ export default function TwoStepDistrictSelect({
     }
   }
 
+  const selectedDistrict = DISTRICTS.find(d => d.id === firstValue);
+
   return (
     <div ref={containerRef} className={`w-full ${className}`}>
       {/* FIRST FIELD */}
       <div className="relative">
-        <input
+
+
+        {/* <input
           type="text"
           placeholder={placeholder}
           value={showSecond ? firstValue : query || firstValue}
@@ -132,7 +136,25 @@ export default function TwoStepDistrictSelect({
           onClick={handleInputClick}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-        />
+        /> */}
+
+           <input
+  type="text"
+  placeholder={placeholder}
+  value={
+    showSecond
+      ? selectedDistrict?.name || ""
+      : query || selectedDistrict?.name || ""
+  }
+  readOnly={showSecond}
+  className={`w-full border rounded-md px-3 py-2 
+   ${showSecond ? "bg-gray-100 cursor-not-allowed" : ""}`}
+  onClick={handleInputClick}
+  onChange={(e) => setQuery(e.target.value)}
+  onKeyDown={handleKeyDown}
+/>
+
+
 
         {openDropdown && !showSecond && (
           <ul className="absolute mt-1 z-50 max-h-52 w-full overflow-auto border rounded bg-white shadow">

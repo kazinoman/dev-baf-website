@@ -64,7 +64,7 @@ export default function Header() {
         {
           title: "Athlete Portal",
           links: [
-            { name: "Online Registration", href: "/registration" },
+            { name: "Online Registration", href: "/athletes/registration" },
             // { name: "Athlete Login", href: "/athletes/track-field" },
             // { name: "Athlete Dashboard", href: "/athletes/swimming" },
           ],

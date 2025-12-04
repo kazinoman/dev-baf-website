@@ -11,14 +11,23 @@ import {
 import { motion } from "framer-motion";
 import TwoStepDistrictSelect from "@/components/ui/TwoStepSearchableSelect";
 import ImageUploadField from "@/components/ui/ImageUploadField";
-import { BookText, FileChartLine, Globe, ListMinus, MapPin, ShieldCheck, User } from "lucide-react";
+import {
+  BookText,
+  FileChartLine,
+  Globe,
+  ListMinus,
+  MapPin,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 import DocumentForm from "@/components/ui/documentForm";
+import MultipleImageUpload from "@/components/ui/multipleImageUpload";
 
 // ================= Type ===================
 
 export interface AthleteFormDto {
   AthleteGenData?: AthleteGeneralDto;
-  identifierVerification: IdentifierVerification,
+  identifierVerification: IdentifierVerification;
   AthleteCoreDataInBengali?: AthleteCoreDataInBengaliDto;
   AthleteAddresses?: AthleteAddressDto[];
   AthleteDocuments?: AthleteDocumentDto[];
@@ -30,6 +39,7 @@ export interface AthleteFormDto {
   photo: FileList;
   permanentDistrict: string;
   AthleteDocPhysicalPathUrl: FileList | null;
+  identifierFiles: FileList | null
 }
 
 export interface AthleteGeneralDto {
@@ -68,7 +78,7 @@ export interface AthleteAddressDto {
 interface IdentifierVerification {
   identifierType: number;
   idNumber: number;
-  identifierDocumentImages: File[] | string[]
+  identifierDocumentImages: FileList | string[];
 }
 
 // ============== Type form ===========
@@ -119,6 +129,7 @@ const columns = [
 export default function MultiStepForm() {
   const [step3Error, setStep3Error] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageInputRefMultiple = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<number>(1);
   const [presentAddressArea, setPresentAddressArea] = useState<string>("");
   const [permanentAddressArea, setpermanentAddressArea] = useState("");
@@ -208,20 +219,20 @@ export default function MultiStepForm() {
       ]);
     }
 
-    if(step === 2) {
-      valid = await trigger([])
+    if (step === 2) {
+      valid = await trigger([]);
     }
 
     if (step === 3) {
       valid = await trigger([
-         "AthleteCoreDataInBengali.AthleteFullNameInBengali",
+        "AthleteCoreDataInBengali.AthleteFullNameInBengali",
         "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
         "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
       ]);
     }
 
-    if(step === 4) {
-      valid = true
+    if (step === 4) {
+      valid = true;
     }
 
     if (step === 5) {
@@ -238,11 +249,7 @@ export default function MultiStepForm() {
     if (valid) setStep((prev) => prev + 1);
   };
 
-
-
   const prevStep = () => setStep((prev) => prev - 1);
-
-
 
   const onSubmit: SubmitHandler<AthleteFormDto> = (data) => {
     const finalData = {
@@ -250,6 +257,26 @@ export default function MultiStepForm() {
       // nidFile,
       // photo: photoFile,
     };
+     
+     const identifierFiles: File[] = data.identifierFiles
+      ? Array.from(data.identifierFiles)
+      : [];
+
+    // 🧠 Step 2: Send to backend
+    const formData = new FormData();
+
+     identifierFiles.forEach((file) => {
+      formData.append("identifierFiles", file);
+    });
+
+    console.log("All images and files:", identifierFiles);
+    console.log("formdata:", formData)
+
+
+
+
+
+
 
     // console.log("Data:", data);
 
@@ -302,12 +329,13 @@ export default function MultiStepForm() {
       athleteDocuments: updatedDocs,
       identifierVerification: {
         identifierType: Number(data?.identifierVerification.identifierType),
-        idNumber: data?.identifierVerification?.idNumber
-      }
+        idNumber: Number(data?.identifierVerification?.idNumber),
+        identifierDocumentImages: identifierFiles
+      },
     };
 
     console.log("Final Submitted:", athleteForm);
-    // console.log("Final Submitted Data:", finalData);
+    console.log("Final Submitted Data Form :", finalData);
 
     // console.log({
     //   presentDistrict,
@@ -376,7 +404,6 @@ export default function MultiStepForm() {
 
   return (
     <div className="min-h-screen p-6 pt-40 bg-white grid grid-cols-12 ">
- 
       <div className="col-span-4 flex justify-center items-center">
         <h1>Content</h1>
       </div>
@@ -387,8 +414,8 @@ export default function MultiStepForm() {
           {[
             { id: 1, label: "Information", icon: <User /> },
             { id: 2, label: "Identifier", icon: <ShieldCheck /> },
-             
-            { id: 3, label: "বাংলায় তথ্য", icon: <Globe />},
+
+            { id: 3, label: "বাংলায় তথ্য", icon: <Globe /> },
             { id: 4, label: "Address", icon: <MapPin /> },
             { id: 5, label: "Documents", icon: <BookText /> },
           ].map((item) => (
@@ -402,7 +429,6 @@ export default function MultiStepForm() {
                 }`}
               >
                 {item.icon}
-                
               </div>
               <span
                 className={`mt-2 text-sm ${
@@ -674,149 +700,148 @@ export default function MultiStepForm() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-            <h2 className="text-xl font-semibold">Identifier Verification</h2>
+              <h2 className="text-xl font-semibold">Identifier Verification</h2>
 
+              <div>
+                <label className="block text-sm font-medium">
+                  Identifier Type
+                  <span className="text-red-600"> *</span>
+                </label>
+                <select
+                  {...register("identifierVerification.identifierType", {
+                    required: "Identifier Type is required",
+                  })}
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                >
+                  <option value="">Select Identifier Type</option>
+                  <option value="1">A</option>
+                  <option value="2">B</option>
+                  <option value="3">C</option>
+                  <option value="4">D</option>
+                </select>
+                {errors.identifierVerification?.identifierType && (
+                  <p className="text-red-500 text-sm">
+                    {errors.identifierVerification?.identifierType.message}
+                  </p>
+                )}
+              </div>
 
-             <div>
-                  <label className="block text-sm font-medium">
-                    Identifier Type
-                    <span className="text-red-600"> *</span>
-                  </label>
-                  <select
-                    {...register("identifierVerification.identifierType", {
-                      required: "Identifier Type is required",
-                    })}
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  >
-                    <option value="">Select Identifier Type</option>
-                    <option value="1">A</option>
-                    <option value="2">B</option>
-                    <option value="3">C</option>
-                    <option value="4">D</option>
-                  </select>
-                  {errors.identifierVerification?.identifierType && (
-                    <p className="text-red-500 text-sm">
-                      {errors.identifierVerification?.identifierType.message}
-                    </p>
-                  )}
-                </div>
+              <div>
+                <label className="block text-sm font-medium">
+                  ID Number <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  type="number"
+                  {...register("identifierVerification.idNumber", {
+                    required: "ID Number is required",
+                  })}
+                  placeholder="Enter Alternate Contact No"
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
+                {errors?.identifierVerification?.idNumber && (
+                  <p className="text-red-500 text-sm">
+                    {errors.identifierVerification?.idNumber.message}
+                  </p>
+                )}
+              </div>
 
-
-                <div>
-                  <label className="block text-sm font-medium">
-                    ID Number <span className="text-red-600"> *</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register("identifierVerification.idNumber", {
-                      required: "ID Number is required",
-                    })}
-                    placeholder="Enter Alternate Contact No"
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  />
-                  {errors?.identifierVerification?.idNumber && (
-                    <p className="text-red-500 text-sm">
-                      {errors.identifierVerification?.idNumber.message}
-                    </p>
-                  )}
-                </div>
-
-                 
-
+              <MultipleImageUpload
+                // name="identifierVerification.identifierDocumentImages" 
+                name="identifierFiles"
+                control={control}
+                inputRef={imageInputRefMultiple}
+                maxFiles={6}
+              />
             </motion.div>
           )}
 
           {/* STEP 2 - ADDRESS */}
-            {
-              step === 3 && (
-                <motion.div
+          {step === 3 && (
+            <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-             <h1>ব্যক্তিগত তথ্য বাংলায়</h1>
+              <h1>ব্যক্তিগত তথ্য বাংলায়</h1>
 
-
-                {/* Athletes Name Bangla */}
-                 <div>
-                  <label className="block text-sm font-medium">
-                    ক্রীড়াবিদ পূর্ণ নাম (বাংলায়)
-                    <span className="text-red-600"> *</span>
-                  </label>
-                  <input
-                    {...register(
-                      "AthleteCoreDataInBengali.AthleteFullNameInBengali",
-                      { required: "বাংলায় পূর্ণ নাম আবশ্যক" }
-                    )}
-                    placeholder="পূর্ণ নাম লিখুন (বাংলায়)"
-                    className="w-full mt-1 px-4 py-2 border rounded-lg "
-                  />
-
-                  {errors.AthleteCoreDataInBengali
-                    ?.AthleteFullNameInBengali && (
-                    <p className="text-red-500 text-sm">
-                      {
-                        errors.AthleteCoreDataInBengali
-                          ?.AthleteFullNameInBengali?.message
-                      }
-                    </p>
+              {/* Athletes Name Bangla */}
+              <div>
+                <label className="block text-sm font-medium">
+                  ক্রীড়াবিদ পূর্ণ নাম (বাংলায়)
+                  <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  {...register(
+                    "AthleteCoreDataInBengali.AthleteFullNameInBengali",
+                    { required: "বাংলায় পূর্ণ নাম আবশ্যক" }
                   )}
-                </div>
+                  placeholder="পূর্ণ নাম লিখুন (বাংলায়)"
+                  className="w-full mt-1 px-4 py-2 border rounded-lg "
+                />
 
-                {/* Father Name Bangla  */}
-                <div>
-                  <label className="block text-sm font-medium">
-                    পিতার নাম নাম (বাংলায়)
-                    <span className="text-red-600"> *</span>
-                  </label>
-                  <input
-                    {...register(
-                      "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
-                      { required: "পিতার নাম আবশ্যক" }
-                    )}
-                    placeholder="পিতার নাম লিখুন (বাংলায়)"
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  />
+                {errors.AthleteCoreDataInBengali?.AthleteFullNameInBengali && (
+                  <p className="text-red-500 text-sm">
+                    {
+                      errors.AthleteCoreDataInBengali?.AthleteFullNameInBengali
+                        ?.message
+                    }
+                  </p>
+                )}
+              </div>
 
-                  {errors.AthleteCoreDataInBengali
-                    ?.AthleteFatherNameInBengali && (
-                    <p className="text-red-500 text-sm">
-                      {
-                        errors.AthleteCoreDataInBengali
-                          ?.AthleteFatherNameInBengali?.message
-                      }
-                    </p>
+              {/* Father Name Bangla  */}
+              <div>
+                <label className="block text-sm font-medium">
+                  পিতার নাম নাম (বাংলায়)
+                  <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  {...register(
+                    "AthleteCoreDataInBengali.AthleteFatherNameInBengali",
+                    { required: "পিতার নাম আবশ্যক" }
                   )}
-                </div>
+                  placeholder="পিতার নাম লিখুন (বাংলায়)"
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
 
-                {/* Mother Name Bangla  */}
-                  <div>
-                  <label className="block text-sm font-medium">
-                    মাতার নাম (বাংলায়)
-                    <span className="text-red-600"> *</span>
-                  </label>
-                  <input
-                    {...register(
-                      "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
-                      { required: "মাতার নাম আবশ্যক" }
-                    )}
-                    placeholder="মাতার নাম লিখুন (বাংলায়)"
-                    className="w-full mt-1 px-4 py-2 border rounded-lg"
-                  />
+                {errors.AthleteCoreDataInBengali
+                  ?.AthleteFatherNameInBengali && (
+                  <p className="text-red-500 text-sm">
+                    {
+                      errors.AthleteCoreDataInBengali
+                        ?.AthleteFatherNameInBengali?.message
+                    }
+                  </p>
+                )}
+              </div>
 
-                  {errors.AthleteCoreDataInBengali
-                    ?.AthleteMotherNameInBengali && (
-                    <p className="text-red-500 text-sm">
-                      {
-                        errors.AthleteCoreDataInBengali
-                          ?.AthleteMotherNameInBengali?.message
-                      }
-                    </p>
+              {/* Mother Name Bangla  */}
+              <div>
+                <label className="block text-sm font-medium">
+                  মাতার নাম (বাংলায়)
+                  <span className="text-red-600"> *</span>
+                </label>
+                <input
+                  {...register(
+                    "AthleteCoreDataInBengali.AthleteMotherNameInBengali",
+                    { required: "মাতার নাম আবশ্যক" }
                   )}
-                </div>
+                  placeholder="মাতার নাম লিখুন (বাংলায়)"
+                  className="w-full mt-1 px-4 py-2 border rounded-lg"
+                />
 
+                {errors.AthleteCoreDataInBengali
+                  ?.AthleteMotherNameInBengali && (
+                  <p className="text-red-500 text-sm">
+                    {
+                      errors.AthleteCoreDataInBengali
+                        ?.AthleteMotherNameInBengali?.message
+                    }
+                  </p>
+                )}
+              </div>
             </motion.div>
-              )}
+          )}
 
           {step === 4 && (
             <motion.div
@@ -1013,7 +1038,8 @@ export default function MultiStepForm() {
                     </p>
                   )} */}
 
-                  {errors.AthleteDocuments?.[0]?.AthleteDocName && touchedFields.AthleteDocuments?.[0]?.AthleteDocName && (
+                  {errors.AthleteDocuments?.[0]?.AthleteDocName &&
+                    touchedFields.AthleteDocuments?.[0]?.AthleteDocName && (
                       <p className="text-red-500 text-sm">
                         {errors.AthleteDocuments[0].AthleteDocName?.message}
                       </p>
@@ -1032,14 +1058,16 @@ export default function MultiStepForm() {
                     placeholder=" Doc Related Id"
                     className="w-full mt-1 px-4 py-2 border rounded-lg "
                   />
-                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId && touchedFields.AthleteDocuments?.[0]?.AthleteDocRelatedId && (
-                    <p className="text-red-500 text-sm">
-                      {
-                        errors.AthleteDocuments?.[0]?.AthleteDocRelatedId
-                          .message
-                      }
-                    </p>
-                  )}
+                  {errors.AthleteDocuments?.[0]?.AthleteDocRelatedId &&
+                    touchedFields.AthleteDocuments?.[0]
+                      ?.AthleteDocRelatedId && (
+                      <p className="text-red-500 text-sm">
+                        {
+                          errors.AthleteDocuments?.[0]?.AthleteDocRelatedId
+                            .message
+                        }
+                      </p>
+                    )}
                 </div>
 
                 <div>
@@ -1058,11 +1086,12 @@ export default function MultiStepForm() {
                     <option value="2">B</option>
                     <option value="3">C</option>
                   </select>
-                  {errors.AthleteDocuments?.[0]?.DocCategoryId && touchedFields.AthleteDocuments?.[0]?.DocCategoryId && (
-                    <p className="text-red-500 text-sm">
-                      {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
-                    </p>
-                  )}
+                  {errors.AthleteDocuments?.[0]?.DocCategoryId &&
+                    touchedFields.AthleteDocuments?.[0]?.DocCategoryId && (
+                      <p className="text-red-500 text-sm">
+                        {errors.AthleteDocuments?.[0]?.DocCategoryId.message}
+                      </p>
+                    )}
                 </div>
               </div>
 

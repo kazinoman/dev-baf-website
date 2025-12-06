@@ -4,6 +4,9 @@ import { MapPin, Plus, Trash2, AlertCircle } from "lucide-react";
 import type { FormData } from "./FormSchema";
 import { FormInputField, FormSelectField } from "./FormFields";
 import Button from "@/components/ui/Button";
+import { useEffect } from "react";
+import { httpGet } from "@/lib/axios/helpers";
+import { GET_DISTRICTS_URL } from "@/lib/axios/URLs";
 
 const districts = [
   { id: "1", value: "Dhaka" },
@@ -45,6 +48,16 @@ export function AddressesStep() {
       athleteAddressType: "present",
     } as any);
   };
+
+  const getDistrictData = async () => {
+    const res = await httpGet(GET_DISTRICTS_URL);
+
+    console.log(res);
+  };
+
+  useEffect(() => {
+    getDistrictData();
+  }, []);
 
   return (
     <div className="space-y-8">

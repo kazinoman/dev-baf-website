@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import { Inter, Roboto, Poppins, Lato, Nunito, Noto_Sans } from "next/font/google";
+
+import Layout from "@/components/layout/Layout";
 import "./globals.css";
-import { Oswald, Inter, Roboto, Poppins, Lato, Nunito, Noto_Sans } from "next/font/google";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -55,9 +55,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${roboto.variable} ${poppins.variable} ${lato.variable} ${nunito.variable} ${notoSans.variable} font-sans antialiased`}
       >
-        <Header />
-        {children}
-        <Footer />
+        <Layout>{children}</Layout>
       </body>
     </html>
   );
